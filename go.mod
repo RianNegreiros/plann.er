@@ -6,7 +6,14 @@ require github.com/gofiber/fiber/v2 v2.40.1
 
 require golang.org/x/crypto v0.4.0
 
-require github.com/golang-jwt/jwt/v4 v4.4.3
+require (
+	github.com/golang-jwt/jwt/v4 v4.4.3
+)
+
+require (
+	github.com/go-faker/faker/v4 v4.0.0-beta.4
+	golang.org/x/text v0.5.0 // indirect
+)
 
 require (
 	github.com/andybalholm/brotli v1.0.4 // indirect
