@@ -6,4 +6,6 @@ RUN go mod download
 
 COPY . .
 
-CMD ["go", "run", "main.go"]
+RUN go install github.com/cosmtrek/air@latest
+
+CMD ["air"]
