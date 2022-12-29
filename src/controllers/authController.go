@@ -120,23 +120,23 @@ func Logout(c *fiber.Ctx) error {
 }
 
 func UpdateInfo(c *fiber.Ctx) error {
-	id, _ := middlewares.GetUserId(c)
-
-	var user models.User
-
-	database.DB.Where("id = ?", id).First(&user)
-
 	var data map[string]string
 
 	if err := c.BodyParser(&data); err != nil {
 		return err
 	}
 
-	user.FirstName = data["first_name"]
-	user.LastName = data["last_name"]
-	user.Email = data["email"]
+	id, _ := middlewares.GetUserId(c)
 
-	database.DB.Save(&user)
+	user := models.User{
+		FirstName: data["first_name"],
+		LastName:  data["last_name"],
+		Email:     data["email"],
+	}
+
+	user.Id = id
+
+	database.DB.Model(&user).Updates(&user)
 
 	return c.JSON(user)
 }
@@ -156,9 +156,8 @@ func UpdatePassword(c *fiber.Ctx) error {
 
 	id, _ := middlewares.GetUserId(c)
 
-	user := models.User{
-		Id: id,
-	}
+	user := models.User{}
+	user.Id = id
 
 	user.SetPassword(data["password"])
 
