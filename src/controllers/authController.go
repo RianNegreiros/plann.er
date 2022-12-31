@@ -7,10 +7,7 @@ import (
 	"strings"
 	"time"
 
-	"strconv"
-
 	"github.com/gofiber/fiber/v2"
-	"github.com/golang-jwt/jwt/v4"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -56,22 +53,33 @@ func Login(c *fiber.Ctx) error {
 
 	if user.Id == 0 {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"message": "User not found",
+			"message": "Invalid credentials",
 		})
 	}
 
 	if err := user.ComparePassword(data["password"]); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"message": "Incorrect password",
+			"message": "Invalid credentials",
 		})
 	}
 
-	payload := jwt.RegisteredClaims{
-		Subject:   strconv.Itoa(int(user.Id)),
-		ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Hour * 24)),
+	isAmbassador := strings.Contains(c.Path(), "api/ambassador")
+
+	var scope string
+
+	if isAmbassador {
+		scope = "ambassador"
+	} else {
+		scope = "admin"
 	}
 
-	token, err := jwt.NewWithClaims(jwt.SigningMethodHS256, payload).SignedString([]byte("secret"))
+	if !isAmbassador && user.IsAmbassador {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"message": "Unauthorized",
+		})
+	}
+
+	token, err := middlewares.GenerateJWT(user.Id, scope)
 
 	if err != nil {
 		c.Status(fiber.StatusBadRequest)
