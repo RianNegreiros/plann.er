@@ -4,6 +4,7 @@ import (
 	"ambassador/src/database"
 	"ambassador/src/middlewares"
 	"ambassador/src/models"
+	"strings"
 	"time"
 
 	"strconv"
@@ -33,7 +34,7 @@ func Register(c *fiber.Ctx) error {
 		LastName:     data["last_name"],
 		Email:        data["email"],
 		Password:     password,
-		IsAmbassador: false,
+		IsAmbassador: strings.Contains(c.Path(), "api/ambassador"),
 	}
 	user.SetPassword(data["password"])
 
