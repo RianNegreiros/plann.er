@@ -5,6 +5,7 @@ import (
 	"ambassador/src/models"
 	"context"
 	"encoding/json"
+	"sort"
 	"strconv"
 	"strings"
 	"time"
@@ -28,6 +29,8 @@ func CreateProduct(c *fiber.Ctx) error {
 	}
 
 	database.DB.Create(&product)
+
+	go database.ClearCache("products_cache", "products_search")
 
 	return c.JSON(product)
 }
@@ -55,6 +58,8 @@ func UpdateProduct(c *fiber.Ctx) error {
 	}
 
 	database.DB.Model(&product).Updates(product)
+
+	go database.ClearCache("products_cache", "products_search")
 
 	return c.JSON(product)
 }
@@ -99,7 +104,7 @@ func SearchProducts(c *fiber.Ctx) error {
 	var products []models.Product
 	var ctx = context.Background()
 
-	result, err := database.Cache.Get(ctx, "products_cache").Result()
+	result, err := database.Cache.Get(ctx, "products_search").Result()
 
 	if err != nil {
 		database.DB.Find(&products)
@@ -110,7 +115,7 @@ func SearchProducts(c *fiber.Ctx) error {
 			panic(err)
 		}
 
-		database.Cache.Set(ctx, "products_cache", bytes, 30*time.Minute)
+		database.Cache.Set(ctx, "products_search", bytes, 30*time.Minute)
 	} else {
 		json.Unmarshal([]byte(result), &products)
 	}
@@ -128,5 +133,37 @@ func SearchProducts(c *fiber.Ctx) error {
 		searchedProducts = products
 	}
 
-	return c.JSON(searchedProducts)
+	if sortParam := c.Query("sort"); sortParam != "" {
+		sortLower := strings.ToLower(sortParam)
+		if sortLower == "asc" {
+			sort.Slice(searchedProducts, func(i, j int) bool {
+				return searchedProducts[i].Price < searchedProducts[j].Price
+			})
+		} else if sortLower == "desc" {
+			sort.Slice(searchedProducts, func(i, j int) bool {
+				return searchedProducts[i].Price > searchedProducts[j].Price
+			})
+		}
+	}
+
+	var total = len(searchedProducts)
+	page, _ := strconv.Atoi(c.Query("page", "1"))
+	perPage := 9
+
+	var data []models.Product = searchedProducts
+
+	if total <= page*perPage && total >= (page-1)*perPage {
+		data = searchedProducts[(page-1)*perPage:]
+	} else if total >= page*perPage {
+		data = searchedProducts[(page-1)*perPage : page*perPage]
+	} else {
+		data = []models.Product{}
+	}
+
+	return c.JSON(fiber.Map{
+		"data":      data[(page-1)*perPage : page*perPage],
+		"total":     total,
+		"page":      page,
+		"last_page": total/perPage + 1,
+	})
 }
