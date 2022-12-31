@@ -16,7 +16,7 @@ type Order struct {
 	Zip             string      `json:"zip" gorm:"null"`
 	Complete        bool        `json:"complete" gorm:"default:false"`
 	Total           float64     `json:"total"`
-	OrderItem       []OrderItem `json:"order_item" gorm:"foreignKey:OrderId"`
+	OrderItems      []OrderItem `json:"order_item" gorm:"foreignKey:OrderId"`
 }
 
 type OrderItem struct {
@@ -36,7 +36,7 @@ func (order *Order) FullName() string {
 func (order *Order) GetTotal() float64 {
 	var total float64
 
-	for _, orderItem := range order.OrderItem {
+	for _, orderItem := range order.OrderItems {
 		total += orderItem.Price * float64(orderItem.Quantity)
 	}
 
