@@ -3,8 +3,11 @@ package controllers
 import (
 	"ambassador/src/database"
 	"ambassador/src/models"
+	"context"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/stripe/stripe-go/v74"
+	"github.com/stripe/stripe-go/v74/checkout/session"
 )
 
 func Orders(c *fiber.Ctx) error {
@@ -64,7 +67,16 @@ func CreateOrder(c *fiber.Ctx) error {
 		Zip:             request.Zip,
 	}
 
-	database.DB.Create(&order)
+	tx := database.DB.Begin()
+
+	if err := tx.Create(&order).Error; err != nil {
+		tx.Rollback()
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"message": err.Error(),
+		})
+	}
+
+	var lineItems []*stripe.CheckoutSessionLineItemParams
 
 	for _, requestProduct := range request.Products {
 		product := models.Product{}
@@ -82,8 +94,90 @@ func CreateOrder(c *fiber.Ctx) error {
 			AdminRevenue:      total * 0.9,
 		}
 
-		database.DB.Create(&item)
+		if err := tx.Create(&item).Error; err != nil {
+			tx.Rollback()
+			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+				"message": err.Error(),
+			})
+		}
+
+		lineItems = append(lineItems, &stripe.CheckoutSessionLineItemParams{
+			Quantity: stripe.Int64(int64(item.Quantity)),
+		})
 	}
 
-	return c.JSON(order)
+	stripe.Key = ""
+
+	params := &stripe.CheckoutSessionParams{
+		SuccessURL:         stripe.String("http://localhost:5000/success?session_id={CHECKOUT_SESSION_ID}"),
+		CancelURL:          stripe.String("http://localhost:5000/error"),
+		PaymentMethodTypes: stripe.StringSlice([]string{"card"}),
+		LineItems:          lineItems,
+	}
+
+	source, err := session.New(params)
+
+	if err != nil {
+		tx.Rollback()
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"message": err.Error(),
+		})
+	}
+
+	order.TransactionId = source.ID
+
+	if err := tx.Save(&order).Error; err != nil {
+		tx.Rollback()
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"message": err.Error(),
+		})
+	}
+
+	tx.Commit()
+
+	return c.JSON(source)
+}
+
+func CompleteOrder(c *fiber.Ctx) error {
+	var data map[string]string
+
+	if err := c.BodyParser(&data); err != nil {
+		return err
+	}
+
+	order := models.Order{}
+
+	database.DB.Preload("OrderItems").First(&order, models.Order{
+		TransactionId: data["source"],
+	})
+
+	if order.Id == 0 {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"message": "Invalid order",
+		})
+	}
+
+	order.Complete = true
+	database.DB.Save(&order)
+
+	go func(order models.Order) {
+		ambassadorRevenue := 0.0
+		adminRevenue := 0.0
+
+		for _, item := range order.OrderItems {
+			ambassadorRevenue += item.AmbassadorRevenue
+			adminRevenue += item.AdminRevenue
+		}
+
+		user := models.User{}
+		user.Id = order.UserId
+
+		database.DB.First(&user)
+
+		database.Cache.ZIncrBy(context.Background(), "rankings", ambassadorRevenue, user.Name())
+	}(order)
+
+	return c.JSON(fiber.Map{
+		"message": "Order completed",
+	})
 }
