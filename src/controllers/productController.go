@@ -122,7 +122,7 @@ func SearchProducts(c *fiber.Ctx) error {
 
 	var searchedProducts []models.Product
 
-	if s := c.Query("s"); s != "" {
+	if s := c.Query("search"); s != "" {
 		lower := strings.ToLower(s)
 		for _, product := range products {
 			if strings.Contains(strings.ToLower(product.Title), lower) || strings.Contains(strings.ToLower(product.Description), lower) {
