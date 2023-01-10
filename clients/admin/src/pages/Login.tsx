@@ -1,5 +1,5 @@
 import React, {Component, SyntheticEvent} from 'react';
-import './Public.css';
+import './Pages.css';
 import axios from 'axios';
 import {Redirect} from 'react-router-dom';
 
