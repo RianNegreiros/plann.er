@@ -1,13 +1,16 @@
 version: '3.9'
 services:
   backend:
-    build: .
+    build:
+      context: ./
+      dockerfile: ./docker/backend/Dockerfile
     ports:
       - 8000:8000
     volumes:
       - .:/app
     depends_on:
       - db
+      - redis
 
   db:
     image: postgres:latest
@@ -26,3 +29,36 @@ services:
     restart: always
     ports:
       - 6379:6379
+
+  admin:
+    build:
+      context: ./
+      dockerfile: ./docker/admin/Dockerfile
+    ports:
+      - 3000:3000
+    volumes:
+      - .:/app/clients/admin
+    depends_on:
+      - backend
+
+  ambassador:
+    build:
+      context: ./
+      dockerfile: ./docker/ambassador/Dockerfile
+    ports:
+      - 3001:3001
+    volumes:
+      - .:/app/clients/ambassador
+    depends_on:
+      - backend
+
+  checkout:
+    build:
+      context: ./
+      dockerfile: ./docker/checkout/Dockerfile
+    ports:
+      - 3002:3002
+    volumes:
+      - .:/app/clients/checkout
+    depends_on:
+      - backend
