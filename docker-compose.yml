@@ -10,16 +10,16 @@ services:
       - db
 
   db:
-    image: mysql:5.7
+    image: postgres:latest
     restart: always
     environment:
-      MYSQL_DATABASE: ambassador
-      MYSQL_PASSWORD: root
-      MYSQL_ROOT_PASSWORD: root
+      POSTGRES_USER: goambassador
+      POSTGRES_PASSWORD: goambassador
+      POSTGRES_DB: goambassador
+    ports:
+      - '5432:5432'
     volumes:
       - .dbdata:/var/lib/mysql
-    ports:
-      - 3306:3306
 
   redis:
     image: redis:latest
