@@ -2,7 +2,6 @@ import React, {useEffect} from 'react';
 import Layout from "../components/Layout";
 import {useRouter} from "next/router";
 import axios from "axios";
-import constants from "../constants";
 
 const Success = () => {
     const router = useRouter();
@@ -12,7 +11,7 @@ const Success = () => {
         if (source !== undefined) {
             (
                 async () => {
-                    await axios.post(`${constants.endpoint}/orders/confirm`, {
+                    await axios.post(`${process.env.REACT_APP_BASE_URL}/orders/confirm`, {
                         source
                     })
                 }

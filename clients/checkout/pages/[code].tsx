@@ -2,7 +2,6 @@ import Layout from "../components/Layout";
 import {useRouter} from "next/router";
 import {SyntheticEvent, useEffect, useState} from "react";
 import axios from "axios";
-import constants from "../constants";
 
 declare var Stripe;
 
@@ -24,7 +23,7 @@ export default function Home() {
         if (code != undefined) {
             (
                 async () => {
-                    const {data} = await axios.get(`${constants.endpoint}/links/${code}`);
+                    const {data} = await axios.get(`${process.env.BASE_URL}/links/${code}`);
 
                     setUser(data.user);
                     setProducts(data.products);
@@ -61,7 +60,7 @@ export default function Home() {
     const submit = async (e: SyntheticEvent) => {
         e.preventDefault();
 
-        const {data} = await axios.post(`${constants.endpoint}/orders`, {
+        const {data} = await axios.post(`${process.env.BASE_URL}/orders`, {
             first_name,
             last_name,
             email,
@@ -73,7 +72,7 @@ export default function Home() {
             products: quantities
         });
 
-        const stripe = new Stripe(constants.stripe_key);
+        const stripe = new Stripe(process.env.STRIPE_KEY);
 
         stripe.redirectToCheckout({
             sessionId: data.id
