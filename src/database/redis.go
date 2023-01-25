@@ -15,10 +15,8 @@ var CacheChannel chan string
 func SetupRedis() {
 	addr := os.Getenv("REDIS_ADDRESS")
 
-	Cache = redis.NewClient(&redis.Options{
-		Addr: addr,
-		DB:   0,
-	})
+	opt, _ := redis.ParseURL(addr)
+	Cache = redis.NewClient(opt)
 }
 
 func SetupCacheChannel() {
