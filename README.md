@@ -9,8 +9,8 @@
 
 ### Preview
 
-![Application Preview 1](/Clients/Documentation/imgs/Preview.png)
-![Admin Dashboard Preview](/Clients/Documentation/imgs/AdminPreview.png)
+![Application Preview 1](/clients/Documentation/imgs/Preview.png)
+![Admin Dashboard Preview](/clients/Documentation/imgs/AdminPreview.png)
 
 ### Tecnologies and Tools
 
