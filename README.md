@@ -1,11 +1,11 @@
 # Ambassador App
 
-## Application to earn money sharing links
+## Application to ambassadors earn money sharing links
 
 ## [API](https://go-ambassador.onrender.com/api)
 
 ![Vercel](https://vercelbadge.vercel.app/api/riannegreiros/go-ambassador) <br />
-[Ambassador live site](https://go-ambassador.vercel.app/)
+[Ambassador live preview](https://go-ambassador.vercel.app/)
 
 ### Preview
 
@@ -30,8 +30,8 @@
 
 [Docker Compose](https://docs.docker.com/compose/gettingstarted/)
 
-1. Remove **.example** from env.example filename and fill the values according to PostgreSQL and Redis config on docker-compose.yml or with your production databases
+1. Create a ```.env``` file based on ```.env.example``` and fill the values according to PostgreSQL and Redis config on ```docker-compose.yml``` or with your production databases
 
-2. Run docker-compose up
+2. Run ```docker-compose up```
 
-3. Go to localhost:8000/api on your preferably browser to use the API. localhost:3000 to access admin dashboard. localhost:3001 to use the application as ambassador.
+3. Go to ```localhost:8000/api``` on your preferably browser to use the **API**. ```localhost:3000``` to access **admin dashboard**. ```localhost:3001``` to use the application as **ambassador**.
