@@ -29,6 +29,7 @@
 ### Prerequisites
 
 [Docker Compose](https://docs.docker.com/compose/gettingstarted/)
+<hr/>
 
 1. Create a ```.env``` file based on ```.env.example``` and fill the values according to PostgreSQL and Redis config on ```docker-compose.yml``` or with your production databases
 
