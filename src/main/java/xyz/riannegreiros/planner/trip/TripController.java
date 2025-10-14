@@ -8,6 +8,8 @@ import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import xyz.riannegreiros.planner.participant.ParticipantCreateResponse;
+import xyz.riannegreiros.planner.participant.ParticipantRequestPayload;
 import xyz.riannegreiros.planner.participant.ParticipantsService;
 
 @RestController
@@ -70,5 +72,22 @@ public class TripController {
         }
 
         return ResponseEntity.notFound().build();
+    }
+    
+    @PostMapping("/{id}/invite")
+    public ResponseEntity<ParticipantCreateResponse> inviteParticipant(@PathVariable UUID id, @RequestBody ParticipantRequestPayload payload) {
+      Optional<Trip> trip = this.repository.findById(id);
+      
+      if(trip.isPresent()) {
+          Trip trip1 = trip.get();
+          
+          ParticipantCreateResponse participantCreateResponse = this.service.registerParticipantToEvent(payload.email(), trip1);
+          
+          if (trip1.isConfirmed()) this.service.triggerConfirmationEmailToParticipant(payload.email());
+          
+          return ResponseEntity.ok(participantCreateResponse);
+      }
+      
+      return ResponseEntity.notFound().build();
     }
 }

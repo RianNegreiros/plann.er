@@ -37,7 +37,7 @@ public class Trip {
   private LocalDateTime endsAt;
 
   @Column(name = "is_confirmed", nullable = false)
-  private boolean isConfirmed;
+  private boolean confirmed;
 
   @Column(name = "owner_name", nullable = false)
   private String ownerName;
@@ -49,7 +49,7 @@ public class Trip {
     this.destination = payload.destination();
     this.startsAt = LocalDateTime.parse(payload.starts_at(), DateTimeFormatter.ISO_DATE_TIME);
     this.endsAt = LocalDateTime.parse(payload.ends_at(), DateTimeFormatter.ISO_DATE_TIME);
-    this.isConfirmed = false;
+    this.confirmed = false;
     this.ownerName = payload.owner_name();
     this.ownerEmail = payload.owner_email();
   }
