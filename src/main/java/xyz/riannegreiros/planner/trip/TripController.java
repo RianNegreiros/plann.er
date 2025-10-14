@@ -8,6 +8,7 @@ import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import xyz.riannegreiros.planner.participant.ParticipantsService;
 
 @RestController
 @RequestMapping("/trips")
@@ -24,7 +25,7 @@ public class TripController {
     Trip newTrip = new Trip(payload);
 
     this.repository.save(newTrip);
-    this.service.registerParticipantsToEvent(payload.emails_to_invite(), newTrip.getId());
+    this.service.registerParticipantsToEvent(payload.emails_to_invite(), newTrip);
 
     return ResponseEntity.ok(new TripCreateResponse(newTrip.getId()));
   }
