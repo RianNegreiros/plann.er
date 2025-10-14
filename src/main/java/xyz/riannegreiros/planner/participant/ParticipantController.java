@@ -19,14 +19,13 @@ public class ParticipantController {
         Optional<Participant> participant = this.repository.findById(id);
 
         if (participant.isPresent()) {
-            Participant participantCreated = participant.get();
-            participantCreated.setConfirmed(true);
-            participantCreated.setName(payload.name());
-            participantCreated.setEmail(participantCreated.getEmail());
+            Participant participantToUpdate = participant.get();
+            participantToUpdate.setConfirmed(true);
+            participantToUpdate.setName(payload.name());
 
-            this.repository.save(participantCreated);
+            this.repository.save(participantToUpdate);
 
-            return ResponseEntity.ok(participantCreated);
+            return ResponseEntity.ok(participantToUpdate);
         }
 
         return ResponseEntity.notFound().build();
