@@ -1,11 +1,5 @@
 package xyz.riannegreiros.planner.trip;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,7 +11,16 @@ import xyz.riannegreiros.planner.link.LinkData;
 import xyz.riannegreiros.planner.link.LinkRequestPayload;
 import xyz.riannegreiros.planner.link.LinkResponse;
 import xyz.riannegreiros.planner.link.LinkService;
-import xyz.riannegreiros.planner.participant.*;
+import xyz.riannegreiros.planner.participant.ParticipantCreateResponse;
+import xyz.riannegreiros.planner.participant.ParticipantData;
+import xyz.riannegreiros.planner.participant.ParticipantRequestPayload;
+import xyz.riannegreiros.planner.participant.ParticipantsService;
+
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/trips")
@@ -82,8 +85,8 @@ public class TripController {
     // Participant endpoints
     @PostMapping("/{id}/invite")
     public ResponseEntity<ParticipantCreateResponse> inviteParticipant(
-            @PathVariable UUID id,
-            @RequestBody ParticipantRequestPayload payload) {
+        @PathVariable UUID id,
+        @RequestBody ParticipantRequestPayload payload) {
         Optional<Trip> tripOptional = this.repository.findById(id);
         if (tripOptional.isEmpty()) {
             return ResponseEntity.notFound().build();
@@ -106,8 +109,8 @@ public class TripController {
     // Activity endpoints
     @PostMapping("/{id}/activities")
     public ResponseEntity<ActivityResponse> createActivity(
-            @PathVariable UUID id,
-            @RequestBody ActivityRequestPayload payload) {
+        @PathVariable UUID id,
+        @RequestBody ActivityRequestPayload payload) {
         Optional<Trip> tripOptional = this.repository.findById(id);
         if (tripOptional.isEmpty()) {
             return ResponseEntity.notFound().build();
@@ -127,8 +130,8 @@ public class TripController {
     // Link endpoints
     @PostMapping("/{id}/links")
     public ResponseEntity<LinkResponse> createLink(
-            @PathVariable UUID id,
-            @RequestBody LinkRequestPayload payload) {
+        @PathVariable UUID id,
+        @RequestBody LinkRequestPayload payload) {
         Optional<Trip> tripOptional = this.repository.findById(id);
         if (tripOptional.isEmpty()) {
             return ResponseEntity.notFound().build();

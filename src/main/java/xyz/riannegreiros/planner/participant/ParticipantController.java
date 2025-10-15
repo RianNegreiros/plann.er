@@ -10,7 +10,7 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/participants")
 public class ParticipantController {
-    
+
     @Autowired
     ParticipantRepository repository;
 

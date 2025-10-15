@@ -9,7 +9,7 @@ import java.util.UUID;
 
 @Service
 public class LinkService {
-    
+
     @Autowired
     LinkRepository repository;
 

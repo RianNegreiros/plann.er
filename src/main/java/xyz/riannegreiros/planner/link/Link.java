@@ -16,11 +16,11 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Link {
-    
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
-    
+
     @Column(nullable = false)
     private String title;
 

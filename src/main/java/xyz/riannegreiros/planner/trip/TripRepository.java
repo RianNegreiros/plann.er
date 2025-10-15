@@ -1,8 +1,8 @@
 package xyz.riannegreiros.planner.trip;
 
-import java.util.UUID;
-
 import org.springframework.data.jpa.repository.JpaRepository;
+
+import java.util.UUID;
 
 public interface TripRepository extends JpaRepository<Trip, UUID> {
 }
