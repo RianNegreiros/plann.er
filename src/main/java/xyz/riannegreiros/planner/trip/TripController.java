@@ -13,6 +13,9 @@ import xyz.riannegreiros.planner.activity.ActivityData;
 import xyz.riannegreiros.planner.activity.ActivityRequestPayload;
 import xyz.riannegreiros.planner.activity.ActivityResponse;
 import xyz.riannegreiros.planner.activity.ActivityService;
+import xyz.riannegreiros.planner.link.LinkRequestPayload;
+import xyz.riannegreiros.planner.link.LinkResponse;
+import xyz.riannegreiros.planner.link.LinkService;
 import xyz.riannegreiros.planner.participant.*;
 
 @RestController
@@ -27,6 +30,9 @@ public class TripController {
   
   @Autowired
   ActivityService activityService;
+  
+  @Autowired
+  LinkService linkService;
 
   @PostMapping
   public ResponseEntity<TripCreateResponse> createTrip(@RequestBody TripRequestPayload payload) {
@@ -107,6 +113,21 @@ public class TripController {
             ActivityResponse activityResponse = this.activityService.registerActivity(payload, trip1);
 
             return ResponseEntity.ok(activityResponse);
+        }
+
+        return ResponseEntity.notFound().build();
+    }
+
+    @PostMapping("/{id}/links")
+    public ResponseEntity<LinkResponse> createLinks(@PathVariable UUID id, @RequestBody LinkRequestPayload payload) {
+        Optional<Trip> trip = this.repository.findById(id);
+
+        if(trip.isPresent()) {
+            Trip trip1 = trip.get();
+
+            LinkResponse linkResponse = this.linkService.registerLink(payload, trip1);
+
+            return ResponseEntity.ok(linkResponse);
         }
 
         return ResponseEntity.notFound().build();
