@@ -13,6 +13,7 @@ import xyz.riannegreiros.planner.activity.ActivityData;
 import xyz.riannegreiros.planner.activity.ActivityRequestPayload;
 import xyz.riannegreiros.planner.activity.ActivityResponse;
 import xyz.riannegreiros.planner.activity.ActivityService;
+import xyz.riannegreiros.planner.link.LinkData;
 import xyz.riannegreiros.planner.link.LinkRequestPayload;
 import xyz.riannegreiros.planner.link.LinkResponse;
 import xyz.riannegreiros.planner.link.LinkService;
@@ -131,6 +132,13 @@ public class TripController {
         }
 
         return ResponseEntity.notFound().build();
+    }
+
+    @GetMapping("/{id}/links")
+    public ResponseEntity<List<LinkData>> getAllTripsLinks(@PathVariable UUID id) {
+        List<LinkData> linkDataList = this.linkService.getAllLinksFromTripId(id);
+
+        return ResponseEntity.ok(linkDataList);
     }
 
     @GetMapping("/{id}/activities")
