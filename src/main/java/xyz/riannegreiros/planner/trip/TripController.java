@@ -9,6 +9,10 @@ import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import xyz.riannegreiros.planner.activity.ActivityData;
+import xyz.riannegreiros.planner.activity.ActivityRequestPayload;
+import xyz.riannegreiros.planner.activity.ActivityResponse;
+import xyz.riannegreiros.planner.activity.ActivityService;
 import xyz.riannegreiros.planner.participant.*;
 
 @RestController
@@ -19,14 +23,17 @@ public class TripController {
   TripRepository repository;
 
   @Autowired
-  ParticipantsService service;
+  ParticipantsService participantsService;
+  
+  @Autowired
+  ActivityService activityService;
 
   @PostMapping
   public ResponseEntity<TripCreateResponse> createTrip(@RequestBody TripRequestPayload payload) {
     Trip newTrip = new Trip(payload);
 
     this.repository.save(newTrip);
-    this.service.registerParticipantsToEvent(payload.emails_to_invite(), newTrip);
+    this.participantsService.registerParticipantsToEvent(payload.emails_to_invite(), newTrip);
 
     return ResponseEntity.ok(new TripCreateResponse(newTrip.getId()));
   }
@@ -63,7 +70,7 @@ public class TripController {
         if (trip.isPresent()) {
             Trip tripUpdated = trip.get();
             tripUpdated.setConfirmed(true);
-            this.service.triggerConfirmationEmailToParticipants(id);
+            this.participantsService.triggerConfirmationEmailToParticipants(id);
 
             this.repository.save(tripUpdated);
 
@@ -80,19 +87,41 @@ public class TripController {
       if(trip.isPresent()) {
           Trip trip1 = trip.get();
           
-          ParticipantCreateResponse participantCreateResponse = this.service.registerParticipantToEvent(payload.email(), trip1);
+          ParticipantCreateResponse participantCreateResponse = this.participantsService.registerParticipantToEvent(payload.email(), trip1);
           
-          if (trip1.isConfirmed()) this.service.triggerConfirmationEmailToParticipant(payload.email());
+          if (trip1.isConfirmed()) this.participantsService.triggerConfirmationEmailToParticipant(payload.email());
           
           return ResponseEntity.ok(participantCreateResponse);
       }
       
       return ResponseEntity.notFound().build();
     }
-    
+
+    @PostMapping("/{id}/activities")
+    public ResponseEntity<ActivityResponse> createActivity(@PathVariable UUID id, @RequestBody ActivityRequestPayload payload) {
+        Optional<Trip> trip = this.repository.findById(id);
+
+        if(trip.isPresent()) {
+            Trip trip1 = trip.get();
+
+            ActivityResponse activityResponse = this.activityService.registerActivity(payload, trip1);
+
+            return ResponseEntity.ok(activityResponse);
+        }
+
+        return ResponseEntity.notFound().build();
+    }
+
+    @GetMapping("/{id}/activities")
+    public ResponseEntity<List<ActivityData>> getAllActivities(@PathVariable UUID id) {
+      List<ActivityData> activityResponseList = this.activityService.getAllActivitiesFromTripId(id);
+      
+      return ResponseEntity.ok(activityResponseList);
+    }
+
     @GetMapping("/{id}/participants")
     public ResponseEntity<List<ParticipantData>> getAllParticipantsFromTrip(@PathVariable UUID id) {
-      List<ParticipantData> participants = service.getAllParticipantsFromTrip(id);
+      List<ParticipantData> participants = participantsService.getAllParticipantsFromTrip(id);
       return ResponseEntity.ok(participants);
     }
 }
