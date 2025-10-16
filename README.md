@@ -46,6 +46,8 @@ The Postman collection is included in the repo:
 The collection uses local URLs (http://localhost:8080). Some requests set collection variables like `tripId` and
 `participantId` automatically from responses.
 
+[<img src="https://run.pstmn.io/button.svg" alt="Run In Postman" style="width: 128px; height: 32px;">](https://app.getpostman.com/run-collection/15917186-b60e01f4-acb2-476b-821b-4ac249aed034?action=collection%2Ffork&source=rip_markdown&collection-url=entityId%3D15917186-b60e01f4-acb2-476b-821b-4ac249aed034%26entityType%3Dcollection%26workspaceId%3D76ff1811-a0af-4935-a423-2e5bb926aa1d)
+
 ### Development
 
 Ensure the API is running locally on port 8080 before using the collection.
