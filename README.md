@@ -1,53 +1,66 @@
-## Plann.er
+# Plann.er
 
-A simple trip planning API.
+A simple REST API for collaborative trip planning.
 
-### Overview
+## Table of contents
 
-Plann.er is a REST API to plan trips collaboratively. You can create a trip with a destination and dates, invite
-participants by email, have invitees confirm their participation, and attach activities and useful links to the trip.
-The provided Postman collection demonstrates the typical workflow end-to-end using a local server on port 8080.
+- [Overview](#overview)
+- [Core concepts](#core-concepts)
+- [Typical workflow](#typical-workflow)
+- [Postman collection](#postman-collection)
+- [Development](#development)
+- [ER diagram](#er-diagram)
 
-### Core concepts
+## Overview
 
-- **Trip**: The main entity that holds `destination`, `starts_at`, `ends_at`, and confirmation status. Typical
-  endpoints: `POST /trips`, `GET /trips/{tripId}`, `PUT /trips/{tripId}`, `PATCH /trips/{tripId}` (confirm).
-- **Participant**: People invited to join a trip via email. They can confirm their participation. Typical endpoints:
-  `POST /trips/{tripId}/invite`, `POST /participants/{participantId}` (confirm), `GET /trips/{tripId}/participants`.
-- **Activity**: A scheduled item within a trip (e.g., “Art Museum” at a specific time). Endpoint:
-  `POST /trips/{tripId}/activities`.
-- **Link**: Helpful references related to the trip (e.g., booking links). Endpoint: `POST /trips/{tripId}/links`.
+Plann.er is a REST API that helps teams plan trips together. Create trips with destinations and dates, invite participants by email, have participants confirm, and attach activities and helpful links.
 
-### Typical workflow
+## Core concepts
 
-1. **Create a trip**: `POST /trips` with `destination`, `starts_at`, and `ends_at`.
-  - The Postman tests store the returned `tripId` in a collection variable for subsequent requests.
-2. **Invite participants**: `POST /trips/{tripId}/invite` with an email.
-  - The Postman tests store `participantId` for confirmation.
-3. **Confirm a participant**: `POST /participants/{participantId}` with participant details.
-4. **Add activities**: `POST /trips/{tripId}/activities` with `title` and `occurs_at`.
-5. **Add helpful links**: `POST /trips/{tripId}/links` with `title` and `url`.
-6. **Review trip details**: `GET /trips/{tripId}` to see the current state and participants.
-7. **Confirm or update the trip**: `PATCH /trips/{tripId}` to confirm; `PUT /trips/{tripId}` to update `destination` or
-   dates.
+- Trip: holds `destination`, `starts_at`, `ends_at`, and confirmation status.
+- Participant: invited by email; can confirm participation.
+- Activity: scheduled item within a trip (for example, "Art Museum" at a specific time).
+- Link: useful references related to the trip (for example, booking pages).
 
-### Postman collection
+Common endpoints:
 
-The Postman collection is included in the repo:
+- POST /trips — create a trip
+- GET /trips/{tripId} — fetch trip details
+- PUT /trips/{tripId} — update destination or dates
+- PATCH /trips/{tripId} — confirm the trip
+- POST /trips/{tripId}/invite — invite a participant
+- POST /participants/{participantId} — confirm a participant
+- GET /trips/{tripId}/participants — list participants
+- POST /trips/{tripId}/activities — add an activity
+- POST /trips/{tripId}/links — add a helpful link
+
+## Typical workflow
+
+1. Create a trip: `POST /trips` with `destination`, `starts_at`, and `ends_at`. (Store returned `tripId`.)
+2. Invite participants: `POST /trips/{tripId}/invite` with email. (Store `participantId`.)
+3. Confirm a participant: `POST /participants/{participantId}` with participant details.
+4. Add activities: `POST /trips/{tripId}/activities` with `title` and `occurs_at`.
+5. Add helpful links: `POST /trips/{tripId}/links` with `title` and `url`.
+6. Review trip details: `GET /trips/{tripId}`.
+7. Confirm or update the trip: `PATCH /trips/{tripId}` to confirm; `PUT /trips/{tripId}` to update.
+
+## Postman collection
+
+The repo includes a Postman collection:
 
 - `Plann.er.postman_collection.json`
 
-#### Import into Postman
+Import into Postman:
 
-- Open Postman
-- Click Import → Choose File
-- Select `Plann.er.postman_collection.json`
+1. Open Postman → Import → Choose File
+2. Select `Plann.er.postman_collection.json`
 
-The collection uses local URLs (http://localhost:8080). Some requests set collection variables like `tripId` and
-`participantId` automatically from responses.
+The collection uses local URLs (<http://localhost:8080>) and sets collection variables such as `tripId` and `participantId` from responses during the workflow.
 
-[<img src="https://run.pstmn.io/button.svg" alt="Run In Postman" style="width: 128px; height: 32px;">](https://app.getpostman.com/run-collection/15917186-b60e01f4-acb2-476b-821b-4ac249aed034?action=collection%2Ffork&source=rip_markdown&collection-url=entityId%3D15917186-b60e01f4-acb2-476b-821b-4ac249aed034%26entityType%3Dcollection%26workspaceId%3D76ff1811-a0af-4935-a423-2e5bb926aa1d)
+## Development
 
-### Development
+Run the API locally on port 8080 to use the Postman collection and exercise the endpoints.
 
-Ensure the API is running locally on port 8080 before using the collection.
+## ER diagram
+
+![ER Diagram](./er-diagram.png)
